@@ -1,0 +1,20 @@
+﻿KPI (english),KPI (german),KPI (ukranian),KPI (romanian),KPI (bosnian),KPI (bulgarian),Amount
+in '000 EUR,in '000 EUR,у 000 євро,în '000 EUR,u '000 EUR,в '000 EUR,1.1 .- 31.03.2021
+Interest income (effective interest method),Zinserträge (Effektivzinsmethode),Процентний дохід (ефективний процентний метод),Venituri din dobânzi (metoda dobânzii efective),Prihod od kamate (metod efektivne kamate),Лихвен доход (метод на ефективната лихва),"70,841"
+Interest expenses,Zinsaufwand,Витрати на відсотки,Cheltuieli cu dobânzile,Troškovi kamate,Разходи за лихви,"21,538"
+Net interest income,Zinsüberschuss,Чистий процентний дохід,Venituri nete din dobânzi,Neto prihod od kamata,Нетен лихвен доход,"49,303"
+Fee and commission income,Gebühren- und Provisionserträge,Комісійний дохід,Venituri din taxe și comisioane,Prihodi od naknada i provizije,Приходи от такси и комисиони,"16,837"
+Fee and commission expenses,Gebühren- und Provisionsaufwendungen,Комісійні та комісійні витрати,Cheltuieli cu taxele și comisioanele,Troškovi i troškovi provizije,Разходи за такси и комисионни,"4,881"
+Net fee and commission income,Provisionsüberschuss,Чистий комісійний та комісійний дохід,Venituri nete din taxe și comisioane,Neto naknada i prihod od provizije,Нетни приходи от такси и комисиони,"11,955"
+from foreign exchange transactions,aus Devisengeschäften,від валютних операцій,din tranzacții valutare,deviznih transakcija,от валутни сделки,"3,413"
+from derivative financial instruments,aus derivativen Finanzinstrumenten,з похідних фінансових інструментів,din instrumente financiare derivate,Izvedeni finansijski instrumenti,от деривативни финансови инструменти,
+Result on derecognition of financial assets measured at amortised cost,"Ergebnis aus der Ausbuchung von finanziellen Vermögenswerten, die zu fortgeführten Anschaffungskosten bewertet werden","Результат про припинення визнання фінансових активів, оцінених за амортизованою собівартістю",Rezultatul derecunoașterii activelor financiare evaluate la costul amortizat,Rezultat depriznavanja finansijskih sredstava merenih po amortizovanim troškovima,"Резултат от отписването на финансови активи, оценени по амортизирана стойност",
+Net other operating result,Sonstiges betriebliches Ergebnis,Чистий інший операційний результат,Alt rezultat net din exploatare,Neto drugi operativni rezultat,Нетен друг оперативен резултат,"-2,229"
+Operating income*,Operatives Ergebnis*,Операційний дохід*,Venituri din exploatare*,Operativni prihod*,Оперативен приход*,"62,830"
+Personnel expenses,Personalaufwand,Витрати на персонал,Cheltuieli de personal,Troškovi osoblja,Разходи за персонал,"20,954"
+expenses,Kosten,Витрати,Cheltuielile,Troškove,Разходи,"19,769"
+Loss allowance,Wertberichtigung für Verluste,Надбавка за втрату,Indemnizație pentru pierdere,Naknada za gubitke,Надбавка за загуби,"3,626"
+Profit before tax,Ergebnis vor Steuern,Прибуток до оподаткування,Profit înainte de impozitare,Profit prije poreza,Печалба преди данъци,"18,480"
+Income tax expenses,Ertragsteueraufwand,Витрати з податку на прибуток,Cheltuieli cu impozitul pe profit,Troškovi poreza na dohodak,Разходи за данък върху дохода,"2,856"
+Profit of the period,Periodenergebnis,Прибуток періоду,Profitul perioadei,Profit perioda,Печалба за периода,"15,624"
+Profit attributable to ProCredit shareholders,Den ProCredit Aktionären zurechenbarer Gewinn,"Прибуток, що припадає на акціонерів ПроКредит",Profitul atribuibil acționarilor ProCredit,Profit koji se pripisuje akcionarima ProCredit-a,"Печалба, която може да се припише на акционерите на ПроКредит","15,624"
