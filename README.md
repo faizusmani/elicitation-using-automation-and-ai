@@ -1,4 +1,4 @@
-# elicitation-using-automation-and-ai <img src='./Documentation/1200px-ProCredit_Holding_logo.png' width="12%" alt="Company logo" align="right"> 
+# elicitation-using-automation-and-ai <img src='./Power Automate Cloud/Documentation/1200px-ProCredit_Holding_logo.png' width="12%" alt="Company logo" align="right"> 
 
 ## Power Automate Cloud
 ### Project Overview
@@ -7,7 +7,7 @@ The main goal here was to design a use case involving Microsft and Azure solutio
 
 Project Demonstration Video: https://drive.google.com/file/d/1DGkdSPhIYVD8KbfD3Y13AsbJXgIlO_Od/view?usp=drive_link
 
-<img src='./Documentation/flow-detailed.svg' alt="Project Flow Diagram">
+<img src='./Power Automate Cloud/Documentation/flow-detailed.svg' alt="Project Flow Diagram">
 
 ### Project Description
 <ul>
@@ -25,4 +25,4 @@ Project Demonstration Video: https://drive.google.com/file/d/1DGkdSPhIYVD8KbfD3Y
 ## Power Automate Desktop
 ### Project Overview
 
-<img src='./PA_Desktop/Flow.png' alt="PA_Desktop Flows Image">
+<img src='./Power Automate Desktop/Flow.png' alt="PA_Desktop Flows Image">
