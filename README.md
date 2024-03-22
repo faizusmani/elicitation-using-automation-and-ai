@@ -28,11 +28,19 @@ Project Demonstration Video: https://drive.google.com/file/d/1DGkdSPhIYVD8KbfD3Y
 <img src='./Power Automate Desktop/Flow.png' alt="PA_Desktop Flows Image">
 
 ### Description
-<p>Extraction of Table</p>
+<p>Extraction of Tables</p>
 <ul>
 <li>Various sets of rules were used to extract the 'Consolidated statement of profit or loss' tables from the different PDFs.</li>
-<li>Firstly new instances of Excel and Chrome were launched and the PDF files were read and looped through. Then each PDF file was opened up inside Chrome and the action of searching the text 'Consolidated statement of profit or loss ' was simulated using RPA to search for the exact number of times the phrase occurs inside the PDF.</li>
-<li>Using the number from above as the limit, an inner For loop was run along with the necessary simulated actions to capture the Page numbers where this phrase occurred. The goal here was to capture the correct table as it usually existed on the same page where the searched phrase was present.</li>
-<li>To make the capturing of the table more accurate, some other rules were used like not considering the first 10 pages if the phrase was present there as in all of the cases this indicated the presence of the phrase in the index or a text paragraph without the table. Also, if the phrase occurred more than once on the same page where the table was present, a rule was set so that the table was not written into Excel more than once.</li>
-<li>The table was then captured using the 'Extract Tables from PDF' action and was written in a new Excel Worksheet with its name taken out from the PDF file name. After extracting the necessary tables from all the PDF files, the Excel file was then saved along with the timestamp in its name to avoid overriding when the flow is run again.</li>
+<li>When the flow runs, firstly new instances of Excel and Chrome will be launched and the PDF files will be read and looped through. Then each PDF file will open up inside Chrome and the action of searching the text 'Consolidated statement of profit or loss ' will be simulated using RPA to search for the exact number of times the phrase occurs inside the PDF.</li>
+<li>Using the number from above as the limit, an inner For loop will run along with the necessary simulated actions to capture the Page numbers where this phrase occurs. The goal here is to capture the correct table as it usually exists on the same page where the searched phrase is present.</li>
+<li>To make the capturing of the table more accurate, some other rules are being used like not considering the first 10 pages if the phrase is present there as in all of the cases this indicates the presence of the phrase in the index or a text paragraph without the table. Finally, if the phrase occurs more than once on the same page where the table is present, a rule is set so that the table is not written into Excel more than once.</li>
+<li>The table is then captured using the 'Extract Tables from PDF' action and checked if it is not empty then written in a new Excel Worksheet with its name taken out from the PDF file name. After extracting the necessary tables from all the PDF files, the Excel file is then saved along with the timestamp in its name to avoid overriding when the flow is run again.</li>
+</ul>
+
+<p>Web Scraping</p>
+<ul>
+<li> If the user selects 'Yes' after the main flow gets executed, the sub-flow of web scraping will run.</li>
+<li> All the URLs mentioned in the Excel file 'Weblinks' will be visited one by one in a loop. If the webpage shows Bank locations, the entries on that webpage will be saved in three columns i.e. Bank(name), address, and contact info in a new worksheet.</li>
+<li> Then the Post XML sitemap will be used to save all the links of the articles published on the website in a new worksheet along with the Date and Time when they were published.</li>
+<li> Finally the Page XML Sitemap will be used to store the total number of links the website has, unlike writing the entries directly into the Excel worksheet, the links extracted will be looped through to take out the Category and Sub-Category of web pages using the regular expressions '(?<=https:\/\/www.procredit-holding.com\/)([^\/]*)' and '(?<=https:\/\/www.procredit-holding.com\/.*\/)([^\/]*)' respectively. The entries stored in a list in the previous loop will then be written into an Excel worksheet in the columns Category, Sub-Category, Link, and Last Modified.</li>
 </ul>
