@@ -1,12 +1,14 @@
-Folder.GetFiles Folder: $'''D:\\Projects\\elicitation-using-automation-and-ai\\PA_Desktop\\PDFs''' FileFilter: $'''*''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> Files
+Folder.GetFiles Folder: $'''D:\\Projects\\elicitation-using-automation-and-ai\\Power_Automate_Desktop\\PDFs''' FileFilter: $'''*''' IncludeSubfolders: False FailOnAccessDenied: True SortBy1: Folder.SortBy.NoSort SortDescending1: False SortBy2: Folder.SortBy.NoSort SortDescending2: False SortBy3: Folder.SortBy.NoSort SortDescending3: False Files=> Files
 ON ERROR REPEAT 1 TIMES WAIT 2
 END
 Excel.LaunchExcel.LaunchUnderExistingProcess Visible: True Instance=> ExcelInstance
 WAIT 3
 WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://www.procredit-holding.com/''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> Chrome
+SET SummaryTableRow TO { ^['Report', 'Summary'] }
 LOOP FOREACH CurrentItem IN Files
     System.RunApplication.RunApplication ApplicationPath: $'''Chrome.exe''' CommandLineArguments: CurrentItem.FullName WindowStyle: System.ProcessWindowStyle.Normal ProcessId=> AppProcessId
     WAIT 3
+    Text.GetSubtext.GetSubtextFromStartTo Text: CurrentItem.NameWithoutExtension NumberOfChars: 7 Subtext=> Subtext
     MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({F})consolidated statement of profit or loss ''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
     DISABLE Text.AppendLine Text: $'''Find in page     %CurrentItem.Name%''' LineToAppend: $'''''' Result=> Result
     UIAutomation.ExtractDataFromWindow.ExtractData Control: appmask['Pane \'Find in page 2021_Q1_PCH_Quarterly-Report_L.pdf\'']['Status Bar \'Result 1 of 1\''] BringToFront: True ExtractedData=> DataFromWindow
@@ -19,7 +21,6 @@ LOOP FOREACH CurrentItem IN Files
             IF DataFromWindow2 <> DoubleOccurence THEN
                 Pdf.ExtractTablesFromPDF.ExtractTablesFromPage PDFFile: CurrentItem.FullName PageNumber: DataFromWindow2 MultiPageTables: True SetFirstRowAsHeader: False ExtractedPDFTables=> ExtractedPDFTables
                 IF IsNotEmpty(ExtractedPDFTables) THEN
-                    Text.GetSubtext.GetSubtextFromStartTo Text: CurrentItem.NameWithoutExtension NumberOfChars: 7 Subtext=> Subtext
                     Excel.AddWorksheet Instance: ExcelInstance Name: $'''%Subtext%_%LoopIndex%''' WorksheetPosition: Excel.WorksheetPosition.Last
                     Excel.WriteToExcel.Write Instance: ExcelInstance Value: ExtractedPDFTables[0].Datatable
                     SET DoubleOccurence TO DataFromWindow2
@@ -28,17 +29,31 @@ LOOP FOREACH CurrentItem IN Files
         END
         MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Return}''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
     END
+    MouseAndKeyboard.SendKeys.FocusAndSendKeys TextToSend: $'''{Control}({A})course of business operations ''' DelayBetweenKeystrokes: 10 SendTextAsHardwareKeys: True
+    UIAutomation.ExtractDataFromWindow.ExtractData Control: appmask['Pane \'Find in page 2021_Q1_PCH_Quarterly-Report_L.pdf\'']['Edit \'Page number\''] BringToFront: True ExtractedData=> DataFromWindow2
+    Pdf.ExtractTextFromPDF.ExtractTextFromPage PDFFile: CurrentItem.FullName PageNumber: DataFromWindow2 DetectLayout: False ExtractedText=> ExtractedPDFText
+    Text.ParseText.RegexParse Text: ExtractedPDFText TextToFind: $'''(?<=Course of business operations)(.*\\n)*(?=in EUR m)''' StartingPosition: 0 IgnoreCase: False Matches=> Matches
+    Text.Replace Text: Matches TextToFind: $'''%%''' IsRegEx: True IgnoreCase: False ReplaceWith: $''' percent''' ActivateEscapeSequences: False Result=> ReplacePercent
+    Text.Replace Text: ReplacePercent TextToFind: $'''\\r\\n''' IsRegEx: True IgnoreCase: True ReplaceWith: $'''%''%''' ActivateEscapeSequences: False Result=> ReplaceReturn
+    Web.InvokeWebService.InvokeWebService Url: $'''https://api.openai.com/v1/chat/completions''' Method: Web.Method.Post Accept: $'''application/json''' ContentType: $'''application/json''' CustomHeaders: $'''Authorization: Bearer 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''' RequestBody: $'''{
+     \"model\": \"gpt-3.5-turbo\",
+     \"messages\": [{\"role\": \"user\", \"content\": \"%ReplaceReturn% Summarize the above paragraph in 10 words.\"}],
+     \"temperature\": 0.7
+   }''' ConnectionTimeout: 30 FollowRedirection: True ClearCookies: False FailOnErrorStatus: False EncodeRequestBody: False UserAgent: $'''Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.21) Gecko/20100312 Firefox/3.6''' Encoding: Web.Encoding.AutoDetect AcceptUntrustedCertificates: False Response=> WebServiceResponse StatusCode=> StatusCode
+    Variables.ConvertJsonToCustomObject Json: WebServiceResponse CustomObject=> JsonAsCustomObject
+    SET SummaryTableRow TO SummaryTableRow + [Subtext, JsonAsCustomObject['choices'][0]['message']['content']]
 END
+Excel.SetActiveWorksheet.ActivateWorksheetByName Instance: ExcelInstance Name: $'''Sheet1'''
+Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: {['Report', 'Summary (Generated by ChatGPT)'] } Column: $'''A''' Row: 1
+Excel.WriteToExcel.WriteCell Instance: ExcelInstance Value: SummaryTableRow Column: $'''A''' Row: 2
 DateTime.GetCurrentDateTime.Local DateTimeFormat: DateTime.DateTimeFormat.DateAndTime CurrentDateTime=> CurrentDateTime
 Text.ConvertDateTimeToText.FromCustomDateTime DateTime: CurrentDateTime CustomFormat: $'''MM_dd_yy_hhmmsstt''' Result=> FormattedDateTime
-Excel.CloseExcel.CloseAndSaveAs Instance: ExcelInstance DocumentFormat: Excel.ExcelFormat.FromExtension DocumentPath: $'''D:\\Projects\\elicitation-using-automation-and-ai\\PA_Desktop\\Extract_Tables_%FormattedDateTime%.xlsx'''
+Excel.CloseExcel.CloseAndSaveAs Instance: ExcelInstance DocumentFormat: Excel.ExcelFormat.FromExtension DocumentPath: $'''D:\\Projects\\elicitation-using-automation-and-ai\\Power_Automate_Desktop\\Extract_Tables_%FormattedDateTime%.xlsx'''
 WebAutomation.CloseWebBrowser BrowserInstance: Chrome
 Display.SelectFromListDialog.SelectFromList Title: $'''Scrape the Web''' Message: $'''Do you want to scrape the web to store Procredit bank\'s locations?''' List: $'''Yes
 No''' IsTopMost: False AllowEmpty: False SelectedItem=> SelectedItem SelectedIndex=> SelectedIndex ButtonPressed=> ButtonPressed
 IF SelectedItem = $'''Yes''' THEN
     CALL Web_Scrape
-ELSE
-    WebAutomation.CloseWebBrowser BrowserInstance: Chrome
 END
 
 # [ControlRepository][PowerAutomateDesktop]
@@ -67,36 +82,41 @@ END
 
 
 
+
 -------------------Web Scrape-------------------
 
-Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''D:\\Projects\\elicitation-using-automation-and-ai\\PA_Desktop\\Weblinks.xlsx''' Visible: True ReadOnly: False Instance=> ExcelInstance2
-Excel.ReadFromExcel.ReadAllCells Instance: ExcelInstance2 ReadAsText: True FirstLineIsHeader: True RangeValue=> ExcelData
-Excel.LaunchExcel.LaunchUnderExistingProcess Visible: True Instance=> ExcelInstance3
-WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://www.procredit-holding.com''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> Browser
-SET DataRow3 TO { ^['Category', 'SubCategory', 'Link', 'LastModified'] }
-LOOP FOREACH CurrentItem2 IN ExcelData
-    WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: Browser Url: CurrentItem2['URL'] WaitForPageToLoadTimeout: 60
-    Excel.AddWorksheet Instance: ExcelInstance3 Name: CurrentItem2['Name'] WorksheetPosition: Excel.WorksheetPosition.Last
-    IF CurrentItem2['Name'] = $'''Institutions''' THEN
-        WebAutomation.ExtractData.ExtractTable BrowserInstance: Browser Control: $'''html > body > div > div:eq(3) > div > div:eq(1) > main > article > section:eq(2) > div:eq(1) > div''' ExtractionParameters: {[$'''h3''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''div > p:eq(0)''', $'''Own Text''', $'''''', $'''Value #2'''], [$'''div > p:eq(1)''', $'''Own Text''', $'''''', $'''Value #3'''] } PostProcessData: False TimeoutInSeconds: 60 ExtractedData=> DataFromWebPage
-        Excel.WriteToExcel.WriteCell Instance: ExcelInstance3 Value: {['Bank', 'Address', 'Contact Info'] } Column: $'''A''' Row: 1
-        Excel.WriteToExcel.WriteCell Instance: ExcelInstance3 Value: DataFromWebPage Column: $'''A''' Row: 2
-    ELSE IF CurrentItem2['Name'] = $'''Press Releases''' THEN
-        WebAutomation.ExtractData.ExtractTable BrowserInstance: Browser Control: $'''html > body > div > table > tbody > tr''' ExtractionParameters: {[$'''td:eq(0) > a''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''td:eq(2)''', $'''Own Text''', $'''''', $'''Value #2'''] } PostProcessData: False TimeoutInSeconds: 60 ExtractedData=> DataFromWebPage2
-        Excel.WriteToExcel.WriteCell Instance: ExcelInstance3 Value: {['Link', 'DateTime Posted'] } Column: $'''A''' Row: 1
-        Excel.WriteToExcel.WriteCell Instance: ExcelInstance3 Value: DataFromWebPage2 Column: $'''A''' Row: 2
-    ELSE IF CurrentItem2['Name'] = $'''Site Pages''' THEN
-        WebAutomation.ExtractData.ExtractTable BrowserInstance: Browser Control: $'''html > body > div > table > tbody > tr''' ExtractionParameters: {[$'''td:eq(0) > a''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''td:eq(2)''', $'''Own Text''', $'''''', $'''Value #2'''] } PostProcessData: False TimeoutInSeconds: 60 ExtractedData=> DataFromWebPage3
-        LOOP FOREACH CurrentItem3 IN DataFromWebPage3
-            Text.ParseText.RegexParseForFirstOccurrence Text: CurrentItem3[0] TextToFind: $'''(?<=https:\\/\\/www.procredit-holding.com\\/)([^\\/]*)''' StartingPosition: 0 IgnoreCase: False OccurrencePosition=> Position Match=> Category
-            Text.ParseText.RegexParseForFirstOccurrence Text: CurrentItem3[0] TextToFind: $'''(?<=https:\\/\\/www.procredit-holding.com\\/.*\\/)([^\\/]*)''' StartingPosition: 0 IgnoreCase: False OccurrencePosition=> Position Match=> SubCategory
-            SET DataRow3 TO DataRow3 + [Category, SubCategory, CurrentItem3[0], CurrentItem3[1]]
+
+FUNCTION Web_Scrape GLOBAL
+    Excel.LaunchExcel.LaunchAndOpenUnderExistingProcess Path: $'''D:\\Projects\\elicitation-using-automation-and-ai\\Power_Automate_Desktop\\Weblinks.xlsx''' Visible: True ReadOnly: False Instance=> ExcelInstance2
+    Excel.ReadFromExcel.ReadAllCells Instance: ExcelInstance2 ReadAsText: True FirstLineIsHeader: True RangeValue=> ExcelData
+    Excel.LaunchExcel.LaunchUnderExistingProcess Visible: True Instance=> ExcelInstance3
+    WebAutomation.LaunchChrome.LaunchChrome Url: $'''https://www.procredit-holding.com''' WindowState: WebAutomation.BrowserWindowState.Maximized ClearCache: False ClearCookies: False WaitForPageToLoadTimeout: 60 Timeout: 60 BrowserInstance=> Browser
+    SET DataRow3 TO { ^['Category', 'SubCategory', 'Link', 'LastModified'] }
+    LOOP FOREACH CurrentItem2 IN ExcelData
+        WebAutomation.GoToWebPage.GoToWebPage BrowserInstance: Browser Url: CurrentItem2['URL'] WaitForPageToLoadTimeout: 60
+        Excel.AddWorksheet Instance: ExcelInstance3 Name: CurrentItem2['Name'] WorksheetPosition: Excel.WorksheetPosition.Last
+        IF CurrentItem2['Name'] = $'''Institutions''' THEN
+            WebAutomation.ExtractData.ExtractTable BrowserInstance: Browser Control: $'''html > body > div > div:eq(3) > div > div:eq(1) > main > article > section:eq(2) > div:eq(1) > div''' ExtractionParameters: {[$'''h3''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''div > p:eq(0)''', $'''Own Text''', $'''''', $'''Value #2'''], [$'''div > p:eq(1)''', $'''Own Text''', $'''''', $'''Value #3'''] } PostProcessData: False TimeoutInSeconds: 60 ExtractedData=> DataFromWebPage
+            Excel.WriteToExcel.WriteCell Instance: ExcelInstance3 Value: {['Bank', 'Address', 'Contact Info'] } Column: $'''A''' Row: 1
+            Excel.WriteToExcel.WriteCell Instance: ExcelInstance3 Value: DataFromWebPage Column: $'''A''' Row: 2
+        ELSE IF CurrentItem2['Name'] = $'''Press Releases''' THEN
+            WebAutomation.ExtractData.ExtractTable BrowserInstance: Browser Control: $'''html > body > div > table > tbody > tr''' ExtractionParameters: {[$'''td:eq(0) > a''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''td:eq(2)''', $'''Own Text''', $'''''', $'''Value #2'''] } PostProcessData: False TimeoutInSeconds: 60 ExtractedData=> DataFromWebPage2
+            Excel.WriteToExcel.WriteCell Instance: ExcelInstance3 Value: {['Link', 'DateTime Posted'] } Column: $'''A''' Row: 1
+            Excel.WriteToExcel.WriteCell Instance: ExcelInstance3 Value: DataFromWebPage2 Column: $'''A''' Row: 2
+        ELSE IF CurrentItem2['Name'] = $'''Site Pages''' THEN
+            WebAutomation.ExtractData.ExtractTable BrowserInstance: Browser Control: $'''html > body > div > table > tbody > tr''' ExtractionParameters: {[$'''td:eq(0) > a''', $'''Own Text''', $'''''', $'''Value #1'''], [$'''td:eq(2)''', $'''Own Text''', $'''''', $'''Value #2'''] } PostProcessData: False TimeoutInSeconds: 60 ExtractedData=> DataFromWebPage3
+            LOOP FOREACH CurrentItem3 IN DataFromWebPage3
+                Text.ParseText.RegexParseForFirstOccurrence Text: CurrentItem3[0] TextToFind: $'''(?<=https:\\/\\/www.procredit-holding.com\\/)([^\\/]*)''' StartingPosition: 0 IgnoreCase: False Match=> Category
+                Text.ParseText.RegexParseForFirstOccurrence Text: CurrentItem3[0] TextToFind: $'''(?<=https:\\/\\/www.procredit-holding.com\\/.*\\/)([^\\/]*)''' StartingPosition: 0 IgnoreCase: False Match=> SubCategory
+                SET DataRow3 TO DataRow3 + [Category, SubCategory, CurrentItem3[0], CurrentItem3[1]]
+            END
+            Excel.WriteToExcel.WriteCell Instance: ExcelInstance3 Value: {['Category', 'SubCategory', 'Link', 'Last Modified'] } Column: $'''A''' Row: 1
+            Excel.WriteToExcel.WriteCell Instance: ExcelInstance3 Value: DataRow3 Column: $'''A''' Row: 2
         END
-        Excel.WriteToExcel.WriteCell Instance: ExcelInstance3 Value: {['Category', 'SubCategory', 'Link', 'Last Modified'] } Column: $'''A''' Row: 1
-        Excel.WriteToExcel.WriteCell Instance: ExcelInstance3 Value: DataRow3 Column: $'''A''' Row: 2
+        DISABLE Excel.GetFirstFreeRowOnColumn Instance: ExcelInstance3 Column: 1 FirstFreeRowOnColumn=> FirstFreeRowOnColumn
     END
-    DISABLE Excel.GetFirstFreeRowOnColumn Instance: ExcelInstance3 Column: 1 FirstFreeRowOnColumn=> FirstFreeRowOnColumn
-END
-Excel.CloseExcel.CloseAndSaveAs Instance: ExcelInstance3 DocumentFormat: Excel.ExcelFormat.FromExtension DocumentPath: $'''D:\\Projects\\elicitation-using-automation-and-ai\\PA_Desktop\\Institutions_and_Links_%FormattedDateTime%.xlsx'''
-Excel.CloseExcel.Close Instance: ExcelInstance2
-WebAutomation.CloseWebBrowser BrowserInstance: Browser
+    Excel.CloseExcel.CloseAndSaveAs Instance: ExcelInstance3 DocumentFormat: Excel.ExcelFormat.FromExtension DocumentPath: $'''D:\\Projects\\elicitation-using-automation-and-ai\\Power_Automate_Desktop\\Institutions_and_Links_%FormattedDateTime%.xlsx'''
+    Excel.CloseExcel.Close Instance: ExcelInstance2
+    WebAutomation.CloseWebBrowser BrowserInstance: Browser
+END FUNCTION
+
