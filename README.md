@@ -1,5 +1,5 @@
 # elicitation-using-automation-and-ai <img src='./Power_Automate_Cloud/Documentation/1200px-ProCredit_Holding_logo.png' width="12%" alt="Company logo" align="right"> 
-
+<a href="#bottomOfPage">Power Automate Desktop</a>
 ## Power Automate Cloud
 ### Overview
 This project was made on the quarterly financial reports released by the ProCredit Holding group on their website.
@@ -25,7 +25,7 @@ Project Demonstration Video: https://drive.google.com/file/d/1DGkdSPhIYVD8KbfD3Y
 ## Power Automate Desktop
 ### Overview
 <p>The goal here was to extract the same tables using RPA that were extracted using AI Builder in Power Automate Cloud. Apart from that the Procredit website was scraped to save in Excel the Bank's location info in various countries, all the links of the Articles posted, and the total links the website has divided into categories and sub-categories.</p>
-<img src='./Power_Automate_Desktop/Flow.png' alt="PA_Desktop Flows Image">
+<a id="bottomOfPage"><img src='./Power_Automate_Desktop/Flow.png' alt="PA_Desktop Flows Image"></a>
 
 ### Description
 <p>Extraction of Tables</p>
