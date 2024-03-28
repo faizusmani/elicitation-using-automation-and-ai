@@ -1,5 +1,5 @@
 # elicitation-using-automation-and-ai <img src='./Power_Automate_Cloud/Documentation/1200px-ProCredit_Holding_logo.png' width="12%" alt="Company logo" align="right"> 
-<a href="#bottomOfPage">Power Automate Desktop</a>
+Use-Case Descriptions: &nbsp;&nbsp;<a href="#PACLoud">Power Automate Cloud</a> &nbsp;&nbsp;<a href="#PADesktop">Power Automate Desktop</a>
 ## Power Automate Cloud
 ### Overview
 This project was made on the quarterly financial reports released by the ProCredit Holding group on their website.
@@ -11,7 +11,7 @@ Project Demonstration Video: https://drive.google.com/file/d/1DGkdSPhIYVD8KbfD3Y
 
 ### Description
 <ul>
-  <li>The 6 PDF files present in the folder '.PDFs\Train' were used to train the AI models 'Extract custom information from the document' (this model uses Azure Form Recognizer neural model under the hood) to extract 'Consolidated statement of profit or loss' table and 'Course of business operations' text paragraph.</li>
+  <a id="PACLoud"><li>The 6 PDF files present in the folder '.PDFs\Train' were used to train the AI models 'Extract custom information from the document' (this model uses Azure Form Recognizer neural model under the hood) to extract 'Consolidated statement of profit or loss' table and 'Course of business operations' text paragraph.</li></a>
   <li>Another pre-trained AI model for Text translation was used to translate the information extracted in English from the previous step to some of the main languages of the countries where the ProCredit Group operates i.e. German, Ukrainian, Romanian, Bosnian, and Bulgarian.</li>
   <li>The whole process of picking up the PDF files then running the AI models on it and finally saving the results as CSVs was automated using Power Automate.</li>
   <li>Azure Board was also integrated into the Power Automate flow to create a Work Item with the necessary parameters whenever the flow gets executed.</li>
@@ -25,10 +25,10 @@ Project Demonstration Video: https://drive.google.com/file/d/1DGkdSPhIYVD8KbfD3Y
 ## Power Automate Desktop
 ### Overview
 <p>The goal here was to extract the same tables using RPA that were extracted using AI Builder in Power Automate Cloud. Apart from that the Procredit website was scraped to save in Excel the Bank's location info in various countries, all the links of the Articles posted, and the total links the website has divided into categories and sub-categories.</p>
-<a id="bottomOfPage"><img src='./Power_Automate_Desktop/Flow.png' alt="PA_Desktop Flows Image"></a>
+<img src='./Power_Automate_Desktop/Flow.png' alt="PA_Desktop Flows Image">
 
 ### Description
-<p>Extraction of Tables</p>
+<a id="PADesktop"><p>Extraction of Tables</p></a>
 <ul>
 <li>Various sets of rules were used to extract the 'Consolidated statement of profit or loss' tables from the different PDFs.</li>
 <li>When the flow runs, firstly new instances of Excel and Chrome were launched and the PDF files were read and looped through. Then each PDF file was opened up inside Chrome and the action of searching the text 'Consolidated statement of profit or loss ' was simulated using RPA to search for the exact number of times the phrase occurs inside the PDF.</li>
