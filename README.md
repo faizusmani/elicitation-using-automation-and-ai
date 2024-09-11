@@ -5,10 +5,6 @@ Use-Case Descriptions: &nbsp;&nbsp;<a href="#PACLoud">Power Automate Cloud</a> &
 This project was made on the quarterly financial reports released by the ProCredit Holding group on their website.
 The main goal here was to design a use case involving Microsft and Azure solutions i.e. Power Platform and AI Builder.
 
-Project Demonstration Video: https://drive.google.com/file/d/1DGkdSPhIYVD8KbfD3Y13AsbJXgIlO_Od/view?usp=drive_link
-
-<img src='./Power_Automate_Cloud/Documentation/flow-detailed.svg' alt="Project Flow Diagram">
-
 ### <a id="PACLoud">Description</a>
 <ul>
 <li>The 6 PDF files present in the folder '.PDFs\Train' were used to train the AI models 'Extract custom information from the document' (this model uses Azure Form Recognizer neural model under the hood) to extract 'Consolidated statement of profit or loss' table and 'Course of business operations' text paragraph.</li>
