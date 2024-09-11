@@ -1,4 +1,4 @@
-# elicitation-using-automation-and-ai <img src='./Power_Automate_Cloud/Documentation/1200px-ProCredit_Holding_logo.png' width="12%" alt="Company logo" align="right"> 
+# elicitation-using-automation-and-ai 
 Use-Case Descriptions: &nbsp;&nbsp;<a href="#PACLoud">Power Automate Cloud</a> &nbsp;&nbsp;<a href="#PADesktop">Power Automate Desktop</a>
 ## Power Automate Cloud
 ### Overview
